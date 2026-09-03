@@ -2,9 +2,9 @@ schema_version = "1.0.0"
 
 id = "surge"
 name = "SURGE"
-version = "2.0.0"
+version = "1.0.0"
 tagline = "Generate surf ramps for SurfsUp and Godot"
-maintainer = "Kompile"
+maintainer = "bearlikelion (Mark)"
 
 type = "add-on"
 
