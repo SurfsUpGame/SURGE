@@ -1,0 +1,17 @@
+schema_version = "1.0.0"
+
+id = "surge"
+name = "SURGE"
+version = "2.0.0"
+tagline = "Generate surf ramps for SurfsUp and Godot"
+maintainer = "Kompile"
+
+type = "add-on"
+
+website = "https://github.com/bearlikelion/SURGE"
+
+tags = ["Mesh", "Object", "Game Engine"]
+
+blender_version_min = "4.2.0"
+
+license = ["SPDX:GPL-3.0-or-later"]

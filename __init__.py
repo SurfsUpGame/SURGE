@@ -1,17 +1,21 @@
-bl_info = {
-    "name": "SURGE",
-    "author": "Kompile",
-    "version": (1, 1),
-    "blender": (4, 4, 3),
-    "location": "View3D > Sidebar",
-    "description": "Generates surf ramp meshes",
-    "category": "Add Mesh",
-}
+"""SURGE: surf ramp generation for SurfsUp."""
 
-from . import surf_ramp_generator
+import bpy
+
+from . import icons
+from .operators import SURGE_OT_generate_ramp, SURGE_OT_increase_view
+from .ui import SURGE_PT_MainPanel
+
+_CLASSES = (SURGE_OT_generate_ramp, SURGE_OT_increase_view, SURGE_PT_MainPanel)
+
 
 def register():
-    surf_ramp_generator.register()
+    icons.load()
+    for cls in _CLASSES:
+        bpy.utils.register_class(cls)
+
 
 def unregister():
-    surf_ramp_generator.unregister()
+    for cls in reversed(_CLASSES):
+        bpy.utils.unregister_class(cls)
+    icons.unload()
