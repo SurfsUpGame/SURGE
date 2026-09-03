@@ -75,4 +75,5 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/dist/*.zip \
             --title "SURGE $GITHUB_REF_NAME" \
-            --generate-notes
+            --generate-notes \
+          || gh release upload "$GITHUB_REF_NAME" "$RUNNER_TEMP"/dist/*.zip --clobber
