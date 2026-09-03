@@ -29,10 +29,10 @@ jobs:
             | grep -o "blender-${BLENDER_SERIES}\.[0-9]\+-linux-x64\.tar\.xz" \
             | sort -V | tail -1)
           test -n "$file"
-          curl -sSfL "$base/$file" -o blender.tar.xz
-          mkdir -p "$HOME/blender"
-          tar -xf blender.tar.xz -C "$HOME/blender" --strip-components=1
-          echo "$HOME/blender" >> "$GITHUB_PATH"
+          curl -sSfL "$base/$file" -o "$RUNNER_TEMP/blender.tar.xz"
+          mkdir -p "$RUNNER_TEMP/blender"
+          tar -xf "$RUNNER_TEMP/blender.tar.xz" -C "$RUNNER_TEMP/blender" --strip-components=1
+          echo "$RUNNER_TEMP/blender" >> "$GITHUB_PATH"
 
       - name: Report the Blender version
         run: blender --version
@@ -53,22 +53,26 @@ jobs:
 
       - name: Build the extension
         run: |
-          mkdir -p dist
-          blender --command extension build --source-dir . --output-dir dist
+          mkdir -p "$RUNNER_TEMP/dist"
+          blender --command extension build --source-dir . --output-dir "$RUNNER_TEMP/dist"
 
       - name: Validate the extension
-        run: blender --command extension validate dist/*.zip
+        run: |
+          set -euo pipefail
+          blender --command extension validate "$RUNNER_TEMP"/dist/*.zip
+          size=$(stat -c%s "$RUNNER_TEMP"/dist/*.zip)
+          test "$size" -lt 5000000 || { echo "package is $size bytes, something leaked in"; exit 1; }
 
       - uses: actions/upload-artifact@v4
         with:
           name: surge-extension
-          path: dist/*.zip
+          path: ${{ runner.temp }}/dist/*.zip
 
       - name: Publish the release
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/*.zip \
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/dist/*.zip \
             --title "SURGE $GITHUB_REF_NAME" \
             --generate-notes
