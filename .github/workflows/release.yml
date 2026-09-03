@@ -52,7 +52,9 @@ jobs:
         run: blender -b --factory-startup --python tests/run_tests.py
 
       - name: Build the extension
-        run: blender --command extension build --source-dir . --output-dir dist
+        run: |
+          mkdir -p dist
+          blender --command extension build --source-dir . --output-dir dist
 
       - name: Validate the extension
         run: blender --command extension validate dist/*.zip
