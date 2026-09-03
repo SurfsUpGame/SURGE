@@ -28,11 +28,11 @@ BASE = dict(ramp_name='ramp', material_name='ramp', units_enum='HAMMER',
 # face reads clearest. Left turns need the mirrored side.
 VIEW = Vector((-0.7, -0.7, 0.8))
 VIEW_LEFT = Vector((0.8, -0.7, 0.8))
-VIEW_LOW = Vector((-0.85, -0.7, 0.5))
+VIEW_HERO = Vector((-0.6, -0.85, 0.4))
 
 SHOTS = [
-    ("hero", (1400, 480), VIEW_LOW, dict(ramp_enum='S-curve', angle=200.0,
-                                         bank=20.0, smoothness=64)),
+    ("hero", (1000, 480), VIEW_HERO, dict(ramp_enum='Straight', surf_enum='Both',
+                                          size=2048.0)),
     ("shape-straight", (640, 480), VIEW, dict(ramp_enum='Straight')),
     ("shape-left", (640, 480), VIEW_LEFT, dict(ramp_enum='Left')),
     ("shape-right", (640, 480), VIEW, dict(ramp_enum='Right')),

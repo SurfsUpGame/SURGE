@@ -2,7 +2,7 @@
 
 Surf Ramp Generator: a Blender addon that builds surf ramps for [SurfsUp](https://store.steampowered.com/app/3454830/SurfsUp/) and Godot 4.
 
-![A banked S-curve ramp](docs/images/hero.png)
+![A straight wedge ramp, surfable on both sides](docs/images/hero.png)
 
 This is a fork of [Kompile's SURGE](https://github.com/Kompile/SURGE), retargeted from Source engine map making to SurfsUp map making.
 It works in Hammer units but writes metric meshes that Godot imports with collision already wired up.
@@ -83,21 +83,6 @@ blender -b --factory-startup --python tests/run_tests.py
 ```
 
 The suite generates every style, surf direction and shape combination and checks the mesh is manifold, correctly scaled, properly named, and fully UV mapped.
-
-## Releases
-
-Pushing a `v*` tag runs the tests, builds the extension and publishes the zip as a GitHub release.
-The tag has to match the version in `blender_manifest.toml`.
-
-## Docs images
-
-Every image above is generated, so they stay honest when the geometry changes:
-
-```bash
-blender -b --factory-startup --python docs/render_docs.py
-blender --factory-startup --no-window-focus --enable-event-simulate \
-    --window-geometry 0 0 1400 880 --python docs/capture_ui.py
-```
 
 ## Credits
 
