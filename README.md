@@ -1,14 +1,35 @@
 # SURGE
 
-A Blender addon that generates surf ramp meshes for [SurfsUp](https://store.steampowered.com/app/2915930/SurfsUp/) and Godot.
+Surf Ramp Generator: a Blender addon that builds surf ramps for [SurfsUp](https://store.steampowered.com/app/3454830/SurfsUp/) and Godot 4.
 
-Install it in Blender 4.2 or newer (tested on 5.2 LTS), open the `SURGE` tab in the 3D viewport sidebar, and hit **Add New Ramp**.
+![A banked S-curve ramp](docs/images/hero.png)
+
+This is a fork of [Kompile's SURGE](https://github.com/Kompile/SURGE), retargeted from Source engine map making to SurfsUp map making.
+It works in Hammer units but writes metric meshes that Godot imports with collision already wired up.
+If you are still making Source maps, use the 1.x releases; the physics mesh and the QC workflow are gone from 2.0.
+
+## Install
+
+1. Download `surge-<version>.zip` from the [latest release](https://github.com/SurfsUpGame/SURGE/releases/latest).
+2. Drag it into Blender, or use Edit > Preferences > Add-ons > Install from Disk.
+
+Needs Blender 4.2 or newer, tested on 5.2 LTS.
+
+## Use it
+
+Open the `SURGE` tab in the 3D viewport sidebar (`N`) and hit **Add New Ramp**.
+
+![Blender with the SURGE dialog open over a generated ramp](docs/images/blender-window.png)
+
+Everything lives in that one dialog.
+
+<img src="docs/images/blender-dialog.png" alt="The Add New Ramp dialog" width="330">
 
 ## What comes out
 
-One object, named `<your name>-col`, sitting at the 3D cursor with its origin on the geometry and a scale of exactly (1, 1, 1).
+One object named `<your name>-col`, sitting at the 3D cursor, with its origin on the geometry and a scale of exactly (1, 1, 1).
 
-Godot's scene importer reads the `-col` suffix and builds this for you at import time:
+Godot's scene importer reads the `-col` suffix and builds this at import time:
 
 ```
 your_ramp        MeshInstance3D
@@ -16,46 +37,44 @@ your_ramp        MeshInstance3D
     └── CollisionShape3D   ConcavePolygonShape3D (trimesh)
 ```
 
-No second physics mesh, no QC file, nothing to wire up by hand.
-The suffix dropdown also offers `-colonly` and `-convcol` if you want collision only or a convex hull instead.
+Nothing to wire up by hand.
+The suffix dropdown also offers `-colonly` for collision only and `-convcol` for a convex hull.
 
 ## Scale
 
 SurfsUp treats one Hammer unit as one inch, the same 39.37 units per metre the game hard-codes as `SOURCE_MULT`.
-Type your dimensions in Hammer units (the default) and SURGE converts the mesh to metres on generate, so a ramp lands next to existing map geometry at the right size with nothing to rescale.
-Switch the Units dropdown to Meters if you would rather work metric; the dimension fields convert as you switch.
+Type your dimensions in Hammer units and SURGE converts the mesh to metres on generate, so a ramp lands next to existing map geometry at the right size.
+Switch the Units dropdown to Meters to work metric instead, and the dimension fields convert as you switch.
 
 The **SurfsUp** preset reproduces the profile used by the game's own maps: 384 wide, 544 tall, 64 unit tip, which is a 51.34 degree face.
-The **Classic SURGE** preset restores the original 256 by 320 defaults.
+**Classic SURGE** restores the original 256 by 320 defaults.
 
-## Ramp shapes
+A face has to be steeper than 45.573 degrees to be surfable, which is where the game's `ground_normal_min` of 0.7 lands.
+Anything shallower is walkable floor, and SURGE says so in the dialog and again on generate.
 
-| Shape | What it sweeps |
-| --- | --- |
-| Straight | A plain run, no curve |
-| Left, Right | A flat turn of the given angle |
-| Up, Down | A climb or a drop |
-| Arc, Dip | An arch or a valley, centred on its own midpoint |
-| Spiral | A turn and a climb at once, set by Rise |
-| S-curve | Half the angle one way, half the other |
+## Shapes
 
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/images/shape-straight.png" width="240"><br>Straight | <img src="docs/images/shape-left.png" width="240"><br>Left | <img src="docs/images/shape-right.png" width="240"><br>Right |
+| <img src="docs/images/shape-up.png" width="240"><br>Up | <img src="docs/images/shape-down.png" width="240"><br>Down | <img src="docs/images/shape-spiral.png" width="240"><br>Spiral |
+| <img src="docs/images/shape-arc.png" width="240"><br>Arc | <img src="docs/images/shape-dip.png" width="240"><br>Dip | <img src="docs/images/shape-scurve.png" width="240"><br>S-curve |
+
+Angle sets how far the sweep turns, Size is the inner turn radius, and Spiral takes a Rise on top of that.
+An angle of 360 closes a turn into a loop with no end caps.
 Bank rolls the cross-section into the corner on any turning shape, eased in and out at the ends.
-An angle of 360 closes the sweep into a loop with no end caps.
 
-Wedge style gives a solid ramp; set **Tip** above zero to leave a blunt edge at the thin end instead of a knife edge.
-Thin style gives a slab of even thickness following the slope.
+| | | |
+| :---: | :---: | :---: |
+| <img src="docs/images/style-wedge.png" width="240"><br>Wedge style | <img src="docs/images/style-thin.png" width="240"><br>Thin style | <img src="docs/images/surf-both.png" width="240"><br>Surf both sides |
 
-## Surfability
-
-The game only lets you surf a face steeper than 45.573 degrees, which is where its `ground_normal_min` of 0.7 lands.
-Anything shallower is walkable floor.
-SURGE shows a warning in the dialog and on generate when the dimensions you picked fall under that line.
+Wedge gives a solid ramp, and a Tip above zero leaves a blunt edge at the thin end instead of a knife edge.
+Thin gives a slab of even thickness following the slope.
 
 ## UVs
 
 UVs are computed from distance along the sweep and across the profile, so they tile evenly on every shape and never stretch through a turn.
 One tile spans `Texture Size * UV Scale` units, matching Source texture scale conventions: a 512 texture at scale 0.25 covers 128 units.
-The dialog shows the resulting span as you change either field.
 
 ## Tests
 
@@ -65,8 +84,23 @@ blender -b --factory-startup --python tests/run_tests.py
 
 The suite generates every style, surf direction and shape combination and checks the mesh is manifold, correctly scaled, properly named, and fully UV mapped.
 
-## Source engine
+## Releases
 
-Versions before 2.0 also emitted a `<name>_phys` mesh for Source's VPhysics, driven by a QC file with `$concave`.
-That is gone.
-If you need it, use the 1.x releases.
+Pushing a `v*` tag runs the tests, builds the extension and publishes the zip as a GitHub release.
+The tag has to match the version in `blender_manifest.toml`.
+
+## Docs images
+
+Every image above is generated, so they stay honest when the geometry changes:
+
+```bash
+blender -b --factory-startup --python docs/render_docs.py
+blender --factory-startup --no-window-focus --enable-event-simulate \
+    --window-geometry 0 0 1400 880 --python docs/capture_ui.py
+```
+
+## Credits
+
+SURGE was written by Kompile for Source engine surf maps, and the original [tutorial video](https://youtu.be/WWZm1lRNFAs) still covers the basics.
+Licensed GPL-3.0-or-later, same as the original.
+SurfsUp lives at [surfsup.website](https://surfsup.website/) and on [Steam](https://store.steampowered.com/app/3454830/SurfsUp/).

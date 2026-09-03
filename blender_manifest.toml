@@ -8,10 +8,19 @@ maintainer = "Kompile"
 
 type = "add-on"
 
-website = "https://github.com/bearlikelion/SURGE"
+website = "https://github.com/SurfsUpGame/SURGE"
 
 tags = ["Mesh", "Object", "Game Engine"]
 
 blender_version_min = "4.2.0"
 
 license = ["SPDX:GPL-3.0-or-later"]
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  "/.*",
+  "/docs/",
+  "/tests/",
+  "/*.zip",
+]
