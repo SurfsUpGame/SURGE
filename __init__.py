@@ -4,7 +4,7 @@ bl_info = {
     "version": (1, 1),
     "blender": (4, 4, 3),
     "location": "View3D > Sidebar",
-    "description": "Generates surf ramps for source engine games",
+    "description": "Generates surf ramp meshes",
     "category": "Add Mesh",
 }
 
