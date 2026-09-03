@@ -6,7 +6,7 @@ Surf Ramp Generator: a Blender addon that builds surf ramps for [SurfsUp](https:
 
 This is a fork of [Kompile's SURGE](https://github.com/Kompile/SURGE), retargeted from Source engine map making to SurfsUp map making.
 It works in Hammer units but writes metric meshes that Godot imports with collision already wired up.
-If you are still making Source maps, use the 1.x releases; the physics mesh and the QC workflow are gone from 2.0.
+The physics mesh and the QC workflow are gone, so use Kompile's original if you are still making Source maps.
 
 ## Install
 
