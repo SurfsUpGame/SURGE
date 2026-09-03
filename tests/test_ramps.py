@@ -240,3 +240,22 @@ def test_editing_a_dimension_drops_the_preset():
     stub = _stub(preset_enum='SURFSUP')
     props._mark_custom(stub, None)
     assert stub.preset_enum == 'CUSTOM'
+
+
+def test_multi_turn_spiral_is_not_clamped():
+    """A spiral past 360 degrees has to keep turning, not silently stop at one."""
+    obj = _generate(ramp_enum='Spiral', angle=360.0, rise=0.0, size=2048.0, smoothness=32)
+    one_width, one_verts = obj.dimensions.x, len(obj.data.vertices)
+    obj = _generate(ramp_enum='Spiral', angle=1080.0, rise=0.0, size=2048.0, smoothness=96)
+    turn_width, turn_verts = obj.dimensions.x, len(obj.data.vertices)
+    assert abs(one_width - turn_width) < 1.0, \
+        "three turns should trace the same circle as one, got %.2f against %.2f" % (
+            turn_width, one_width)
+    assert turn_verts > one_verts * 2, \
+        "1080 degrees produced %d verts against %d for 360: the angle was clamped" % (
+            turn_verts, one_verts)
+
+    frames, _closed = path.build_frames('Spiral', 540.0, 1600.0, 544.0, 64, 'Right', -3200.0)
+    swept = frames[-1].to_3x3() @ __import__('mathutils').Vector((-1.0, 0.0, 0.0))
+    # 540 degrees leaves the exit pointing back the way it came
+    assert abs(swept.x - 1.0) < 1e-6, "540 degree spiral ended heading %r" % (swept,)

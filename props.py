@@ -187,8 +187,9 @@ class RampProperties:
         name="", default=16, min=3, max=128,
         description="Segments along the sweep. More is smoother and heavier")
     angle: bpy.props.FloatProperty(
-        name="", default=90.0, min=0.0, max=360.0,
-        description="Degrees the sweep turns through. 360 closes the loop")
+        name="", default=90.0, min=0.0, max=1440.0,
+        description="Degrees the sweep turns through. 360 closes a turn into a "
+                    "loop; a spiral or S-curve can run past it for extra turns")
     rise: bpy.props.FloatProperty(
         name="", default=512.0, update=_mark_custom,
         description="Height gained over the whole spiral. Negative descends")
